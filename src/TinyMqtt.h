@@ -136,6 +136,12 @@ class MqttMessage
       const { return &buffer[(static_cast<uint16_t>(buffer[3]) << 8) + static_cast<uint16_t>(buffer[4]) + 5];}
     void complete() { encodeLength(); }
     void retained() { if ((buffer[0] & 0xF)==Publish) buffer[0] |= 1; }
+    void dropQos() {buffer[0] &= 0xF9 + (0 * 2); 
+      uint16_t s = (static_cast<uint16_t>(buffer[3]) << 8) + static_cast<uint16_t>(buffer[4]) + 5;
+      for (int i = s; i<buffer.length() - 1 ; i++) { buffer[i]=buffer[i+2];}
+      buffer.resize(buffer.size()-2);
+      state = PayLoad;
+      encodeLength(); }
 
     void reset();
 
