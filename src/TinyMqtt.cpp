@@ -655,7 +655,6 @@ void MqttClient::processMessage(MqttMessage* mesg)
         #endif
         // << '(' << string(payload, len).c_str() << ')'  << " msglen=" << mesg->length() << endl;
         if (qos) payload+=2;  // ignore packet identifier if any
-        len=mesg->end()-payload;
         qos = (qos / 2) && 3;
         if (qos == 1) 
         { 
@@ -664,7 +663,9 @@ void MqttClient::processMessage(MqttMessage* mesg)
           msg.add(ID[0]);  // MessgaeID high
           msg.add(ID[1]);  // MessageID low
           msg.sendTo(this);
+          mesg->dropQos();
         }        
+        len=mesg->end()-payload;
         // TODO reset DUP
         // TODO reset RETAIN
 
